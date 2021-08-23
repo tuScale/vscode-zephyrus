@@ -34,13 +34,18 @@ export default class WestExecutor {
 
     private static _execute(config: ZepyhrusConfig, command: WestCommand, params: string[] = []): Promise<String> {
         return new Promise((accept, reject) => {
+            let stdoutData: Buffer | null = null;
             const west = spawn(WestExecutor.EXE_NAME, [ command, ...params ], { 
                 shell: process.env.SHELL,
                 env: WestExecutor._getEnvironmentForWestExecution(config)
             });
             
             west.stdout.on('data', data => {
-                accept(data.toString());
+                if (!stdoutData) {
+                    stdoutData = data;
+                } else {
+                    stdoutData = Buffer.concat([ stdoutData, data ]);
+                }
             });
             west.stderr.on('data', data => {
                 console.error(`WestExecutor stderr: ${data}`);
@@ -49,7 +54,7 @@ export default class WestExecutor {
             west.on('close', code => {
                 if (code === CMD_OK_CODE) {
                     // No-op. Everything ok.
-                    // TODO: maybe only now 'accept' west stdout's data?
+                    accept(stdoutData?.toString() ?? "");
                 } else if (code === CMD_NOT_FOUND_ERR_CODE) {
                     reject(new CommandNotFoundException(WestExecutor.EXE_NAME));
                 } else if (code === CMD_SERIOUS_ERR_CODE) {
