@@ -30,7 +30,7 @@ export default class ZephyrBuildRuntime {
 
     private constructor(
         readonly boards: Board[],
-        readonly version: ZephyrVersion,
+        private readonly version: ZephyrVersion,
         readonly west: WestExecutor,
-        readonly ze: ZephyrusExtension) {}
+        private readonly ze: ZephyrusExtension) {}
 }

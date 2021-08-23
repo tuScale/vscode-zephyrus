@@ -1,5 +1,6 @@
 import { spawn }  from 'child_process';
-import { CancellationToken } from 'vscode';
+
+import * as vscode from 'vscode';
 
 import CommandNotFoundException from './exceptions/CommandNotFoundException';
 import ZepyhrusConfig from './ZephyrusConfig';
@@ -15,7 +16,7 @@ const CMD_NOT_FOUND_ERR_CODE = 127;
 export default class WestExecutor {
     public static readonly EXE_NAME = 'west';
 
-    public static async new(ze: ZephyrusExtension, cancelToken: CancellationToken) : Promise<WestExecutor> {
+    public static async new(ze: ZephyrusExtension, cancelToken: vscode.CancellationToken) : Promise<WestExecutor> {
         const westVersionChecker = WestExecutor._execute(ze.config, "--version")
             .then(westVersionRawResult => {
                 const westVersionMatcherRegex = /West version: (.*)/i;
@@ -86,5 +87,11 @@ export default class WestExecutor {
 
     public execute(command: WestCommand, params: string[] = []): Promise<String> {
         return WestExecutor._execute(this.ze.config, command, params);
+    }
+
+    public getShellExecutionFor(cmdLine: string) : vscode.ShellExecution {
+        return new vscode.ShellExecution(cmdLine, {
+            env: WestExecutor._getEnvironmentForWestExecution(this.ze.config)
+        });
     }
 }

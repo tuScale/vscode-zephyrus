@@ -1,9 +1,10 @@
 import { access } from "fs/promises";
+import path = require("path");
 import * as fs from 'fs';
 
 import * as vscode from "vscode";
+
 import ZephyrusExtension from "./ZephyrusExtension";
-import path = require("path");
 import { NoneSelectedNotificationResult } from "./widgets/BoardSelector";
 import { FlowExecutionResult } from "./flows/Flow";
 
@@ -28,6 +29,8 @@ export default class WestTaskProvider implements vscode.TaskProvider {
     public async resolveTask(task: vscode.Task, _token: vscode.CancellationToken): Promise<vscode.Task | undefined> {
         let taskToRun;
         const definition = <WestTaskDefinition>task.definition;
+        const buildRunTime = await this.ze.getBuildRuntime();
+        const westExecutor = buildRunTime.west;
         let board = await this.ze.config.getTargetedBoard();
         
         if (!board.isDefined()) {
@@ -56,8 +59,8 @@ export default class WestTaskProvider implements vscode.TaskProvider {
             case "build":
                 taskToRun = new vscode.Task(definition, 
                     task.scope ?? vscode.TaskScope.Workspace, 
-                    definition.command, 'west', 
-                    new vscode.ShellExecution(`west build -b ${board.name} -d ${projectBuildDir}`));
+                    definition.command, 'west',
+                    westExecutor.getShellExecutionFor(`west build -b ${board.name} -d ${projectBuildDir}`));
                 break;
             case "flash":
                 let flashShellCmd = 'west flash';
@@ -71,7 +74,7 @@ export default class WestTaskProvider implements vscode.TaskProvider {
                 taskToRun = new vscode.Task(definition, 
                     task.scope ?? vscode.TaskScope.Workspace, 
                     definition.command, 'west', 
-                    new vscode.ShellExecution(flashShellCmd));
+                    westExecutor.getShellExecutionFor(flashShellCmd));
                 break;
         }
         taskToRun.runOptions = {
