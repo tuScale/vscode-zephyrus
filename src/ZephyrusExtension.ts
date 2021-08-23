@@ -47,18 +47,6 @@ export default class ZephyrusExtension {
         this.westTaskProvider.dispose();
     }
 
-    get zephyrBasePath(): string {
-        const configuredPath = this.config.zephyrPath;
-        const envPath = process.env["ZEPHYR_BASE"];
-        const zephyrBasePath = configuredPath ? configuredPath : envPath;
-
-        if (!zephyrBasePath) {
-            // TODO: throw a meaningfull error here since we don't know how to reach Zephyr
-            throw new Error();
-        }
-        return zephyrBasePath;
-    }
-
     public register(entity: Widget | Command) {
         this.vsCodeContext.subscriptions.push(entity);
     }
@@ -74,19 +62,11 @@ export default class ZephyrusExtension {
 
     async getBuildRuntime() {
         if (!this.buildRuntime) {
-            // try {
-                this.buildRuntime = await vscode.window.withProgress({
-                    cancellable: true,
-                    location: vscode.ProgressLocation.Notification,
-                    title: "Checking environment sanity"
-                }, await ZephyrBuildRuntime.initialize(this));
-            // } catch (e) {
-            //     if (e instanceof UserCancelledFlowException) {
-            //         console.warn(e.reason);
-            //     } else {
-            //         console.warn(`Could not instantiate build-time due to an error occuring: ${e}`);
-            //     }
-            // }
+            this.buildRuntime = await vscode.window.withProgress({
+                cancellable: true,
+                location: vscode.ProgressLocation.Notification,
+                title: "Checking environment sanity"
+            }, await ZephyrBuildRuntime.initialize(this));
         }
         return this.buildRuntime;
     }

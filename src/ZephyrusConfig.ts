@@ -24,8 +24,12 @@ class ZephyrConfigKey {
         public mapValueToInstance: (val: string | undefined) => any) {}
 }
 
+export class ZephyrusConfigException {
+    constructor(readonly reason: string) {}
+}
+
 export default class ZepyhrusConfig {
-    public static readonly BASE_PATH_KEY = ZephyrConfigKey.newFor('zephyr.base.path', process.env.ZEPHYR_BASE);
+    public static readonly BASE_PATH_KEY = ZephyrConfigKey.newFor('zephyr.base', process.env.ZEPHYR_BASE);
     public static readonly BOARD_KEY = ZephyrConfigKey.newFor('zephyr.board', Board.NO_BOARD.name, val => Board.newFor(val));
 
     private readonly zConfig: vscode.WorkspaceConfiguration;
@@ -34,8 +38,15 @@ export default class ZepyhrusConfig {
         this.zConfig = vscode.workspace.getConfiguration(configSection);
     }
 
-    get zephyrPath() {
-        return this.zConfig.get<string>(ZepyhrusConfig.BASE_PATH_KEY.key);
+    get zephyrBase(): String {
+        const configuredPath = this._getConfig(ZepyhrusConfig.BASE_PATH_KEY);
+        const envPath = process.env["ZEPHYR_BASE"];
+        const zephyrBasePath = configuredPath ? configuredPath : envPath;
+
+        if (!zephyrBasePath) {
+            throw new ZephyrusConfigException(`Neither the 'ZEPHYR_BASE' environmental variable nor the '${ZepyhrusConfig.BASE_PATH_KEY.key}' path option has been set. We need to know the path to Zephyr in order to continue.`);
+        }
+        return zephyrBasePath;
     }
 
     async getTargetedBoard() : Promise<Board> {

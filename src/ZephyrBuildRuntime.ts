@@ -15,7 +15,7 @@ export default class ZephyrBuildRuntime {
                     reject(new UserCancelledFlowException('User cancelled the build-runtime check-up.'));
                 });
             });
-            const westExecutor = await WestExecutor.new(cancelToken);
+            const westExecutor = await WestExecutor.new(ze, cancelToken);
             const boardsCommandResult = await westExecutor.execute("boards");
             const availableBoardNames = boardsCommandResult.split('\n').filter(entry => entry.length !== 0);
             const availableBoards = await Promise.all(availableBoardNames.map(name => Board.newFor(name)));

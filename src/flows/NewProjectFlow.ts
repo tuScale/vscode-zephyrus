@@ -20,8 +20,8 @@ export default class NewProjectFlow extends Flow {
     }
 
     protected override async _start() {
+        const zephyrBoard = await this.ze.boardSelector.showAndAwaitSelection();
 		const projectName = await this._inputProjectName();
-		const zephyrBoard = await this.ze.boardSelector.showAndAwaitSelection();
 		const selectedFolder = await this._inputProjectPath();
         const projectFolder = `${selectedFolder}/${projectName}`;
 
