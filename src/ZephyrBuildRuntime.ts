@@ -2,7 +2,7 @@ import { CancellationToken, Progress } from "vscode";
 import UserCancelledFlowException from "./exceptions/UserCancelledFlowException";
 import Board from "./models/Board";
 import ZephyrVersion from "./models/ZephyrVersion";
-import WestExecutor from "./WestExecutor";
+import WestExecutor, { WestCommand } from "./WestExecutor";
 import ZephyrusExtension from "./ZephyrusExtension";
 
 export type ProgressableTask<R> = (progress: Progress<{ message?: string; increment?: number }>, token: CancellationToken) => Promise<R>;
@@ -16,7 +16,7 @@ export default class ZephyrBuildRuntime {
                 });
             });
             const westExecutor = await WestExecutor.new(ze, cancelToken);
-            const boardsCommandResult = await westExecutor.execute("boards");
+            const boardsCommandResult = await (westExecutor.execute(WestCommand.BOARDS) as Promise<String>);
             const availableBoardNames = boardsCommandResult.split('\n').filter(entry => entry.length !== 0);
             const availableBoards = await Promise.all(availableBoardNames.map(name => Board.newFor(name)));
             const zephyrVersion = await ZephyrVersion.loadFor(ze);

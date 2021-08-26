@@ -4,7 +4,9 @@ import * as vscode from 'vscode';
 
 import CommandNotFoundException from "../exceptions/CommandNotFoundException";
 import UserCancelledFlowException from "../exceptions/UserCancelledFlowException";
+import { MessageType } from "../models/MessageType";
 import WestExecutor from "../WestExecutor";
+import CallToUriActionMessage from "../widgets/CallToUriActionMessage";
 import { ZephyrusConfigException } from "../ZephyrusConfig";
 
 export enum FlowExecutionResult {
@@ -24,20 +26,15 @@ export default abstract class Flow extends events.EventEmitter {
                 return FlowExecutionResult.Aborted;
             } else if (e instanceof CommandNotFoundException) {
                 if (WestExecutor.EXE_NAME === e.command) {
-                    // TODO: if we'll have more of these notifications, extract them in some utility class? 
-                    vscode.window.showErrorMessage(
+                    CallToUriActionMessage.show(
+                        MessageType.Error, 
                         "The west meta-tool is required yet not available. This possibly means that other dependencies are also missing.", 
-                        "Install them", "Cancel"
-                    ).then(choice => {
-                        if ("Install them" === choice) {
-                            const zephyrGettingStartedUri = vscode.Uri.parse("https://docs.zephyrproject.org/latest/getting_started/index.html");
-                            
-                            vscode.commands.executeCommand("vscode.open", zephyrGettingStartedUri);
-                        }
-                    });
+                        { text: "Install them", uri: "https://docs.zephyrproject.org/latest/getting_started/index.html" }, 
+                        "Cancel"
+                    );
                 }
             } else if (e instanceof ZephyrusConfigException) {
-                vscode.window.showErrorMessage(e.reason);
+                CallToUriActionMessage.show(MessageType.Error, e.reason);
             }
         }
         return FlowExecutionResult.Errored;

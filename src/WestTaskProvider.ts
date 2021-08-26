@@ -7,6 +7,7 @@ import * as vscode from "vscode";
 import ZephyrusExtension from "./ZephyrusExtension";
 import { NoneSelectedNotificationResult } from "./widgets/BoardSelector";
 import { FlowExecutionResult } from "./flows/Flow";
+import { WestCommand } from "./WestExecutor";
 
 interface WestTaskDefinition extends vscode.TaskDefinition {
 	/**
@@ -52,7 +53,7 @@ export default class WestTaskProvider implements vscode.TaskProvider {
             }
         }
         
-        const projectBuildDir = `build/${board.name}`;
+        const relativeBuildDir = `build/${board.name}`;
         const workspaceFolderPath = (<vscode.WorkspaceFolder>task.scope).uri.fsPath;
 
         switch(definition.command) {
@@ -60,21 +61,21 @@ export default class WestTaskProvider implements vscode.TaskProvider {
                 taskToRun = new vscode.Task(definition, 
                     task.scope ?? vscode.TaskScope.Workspace, 
                     definition.command, 'west',
-                    westExecutor.getShellExecutionFor(`west build -b ${board.name} -d ${projectBuildDir}`));
+                    westExecutor.getWestExecutionFor(WestCommand.BUILD, ['-b', board.name, '-d', relativeBuildDir, workspaceFolderPath]));
                 break;
             case "flash":
-                let flashShellCmd = 'west flash';
+                let flashShellCmdArgs = [];
 
                 try {
-                    await access(path.join(workspaceFolderPath, projectBuildDir), fs.constants.F_OK);   
-                    flashShellCmd = `${flashShellCmd} -d ${projectBuildDir}`;
+                    await access(path.join(workspaceFolderPath, relativeBuildDir), fs.constants.F_OK);   
+                    flashShellCmdArgs.push('-d', relativeBuildDir);
                 } catch(e) {
                     // No-op
                 }
                 taskToRun = new vscode.Task(definition, 
                     task.scope ?? vscode.TaskScope.Workspace, 
                     definition.command, 'west', 
-                    westExecutor.getShellExecutionFor(flashShellCmd));
+                    westExecutor.getWestExecutionFor(WestCommand.FLASH, flashShellCmdArgs));
                 break;
         }
         taskToRun.runOptions = {
