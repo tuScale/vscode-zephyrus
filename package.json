@@ -3,7 +3,7 @@
 	"publisher": "tuScale",
 	"displayName": "Zephyrus",
 	"description": "Your single stop for Zephyr app development",
-	"version": "0.1.0",
+	"version": "0.0.9",
 	"engines": {
 		"node": "14.17.3",
 		"vscode": "^1.59.0"

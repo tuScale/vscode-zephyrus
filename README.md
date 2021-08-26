@@ -46,7 +46,7 @@ Everything is covered in the above `Getting Started Guide`. It only takes a bit 
 
 This extension contributes the following settings:
 
-* `zephyrus.zephyr.base.path`: the Zephyr installation path, similar to the `ZEPHYR_BASE` environmental variable [described here](https://docs.zephyrproject.org/2.4.0/application/index.html#important-build-system-variables)
+* `zephyrus.zephyr.base`: the Zephyr installation path, similar to the `ZEPHYR_BASE` environmental variable [described here](https://docs.zephyrproject.org/2.4.0/application/index.html#important-build-system-variables)
 * `zephyrus.zephyr.board`: the Zephyr target board to use. If globally set, it's the default board used for building a project or generating a new one. If defined locally inside a workspace, it's the board passed to `west` when building that respectful project.
 
 ## Known Issues
@@ -57,7 +57,7 @@ This extension contributes the following settings:
 
 ### 0.1.0
 
-Initial release
+... pending
 
 ## License
 [MIT License](LICENSE)
