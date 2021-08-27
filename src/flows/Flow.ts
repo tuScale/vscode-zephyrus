@@ -1,7 +1,5 @@
 import events = require("events");
 
-import * as vscode from 'vscode';
-
 import CommandNotFoundException from "../exceptions/CommandNotFoundException";
 import UserCancelledFlowException from "../exceptions/UserCancelledFlowException";
 import { MessageType } from "../models/MessageType";

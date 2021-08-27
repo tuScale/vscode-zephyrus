@@ -88,6 +88,7 @@
 		"@typescript-eslint/parser": "^4.26.0",
 		"chai": "^4.3.4",
 		"eslint": "^7.27.0",
+		"eslint-plugin-unused-imports": "^1.1.4",
 		"glob": "^7.1.7",
 		"mocha": "^8.4.0",
 		"ts-loader": "^9.2.2",
