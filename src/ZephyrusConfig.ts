@@ -31,6 +31,7 @@ export class ZephyrusConfigException {
 export default class ZepyhrusConfig {
     public static readonly BASE_PATH_KEY = ZephyrConfigKey.newFor('zephyr.base', process.env.ZEPHYR_BASE);
     public static readonly BOARD_KEY = ZephyrConfigKey.newFor('zephyr.board', Board.NO_BOARD.name, val => Board.newFor(val));
+    public static readonly ZEPHYR_BASE_MISSING_MESSAGE = `Neither the 'ZEPHYR_BASE' environmental variable nor the '${ZepyhrusConfig.BASE_PATH_KEY.key}' path option has been set. We need to know the path to Zephyr in order to continue.`;
 
     private readonly zConfig: vscode.WorkspaceConfiguration;
 
@@ -44,7 +45,7 @@ export default class ZepyhrusConfig {
         const zephyrBasePath = configuredPath ? configuredPath : envPath;
 
         if (!zephyrBasePath) {
-            throw new ZephyrusConfigException(`Neither the 'ZEPHYR_BASE' environmental variable nor the '${ZepyhrusConfig.BASE_PATH_KEY.key}' path option has been set. We need to know the path to Zephyr in order to continue.`);
+            throw new ZephyrusConfigException(ZepyhrusConfig.ZEPHYR_BASE_MISSING_MESSAGE);
         }
         return zephyrBasePath;
     }

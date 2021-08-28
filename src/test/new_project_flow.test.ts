@@ -1,47 +1,31 @@
-// Import all the necessary objects from extension tester
-import { Notification, VSBrowser, Workbench, WebDriver, NotificationType } from 'vscode-extension-tester';
+import { assert, expect } from 'chai';
+import { 
+    NotificationType,  
+} from 'vscode-extension-tester';
 
-// We are using chai for assertions, feel free to use whichever package you like
-import { expect } from 'chai';
+import ZephyrusExtensionTester from './ZephyrusExtensionTester';
 
-// Test suite is in standard Mocha BDD format
-describe('Hello World Example UI Tests', () => {
-    let driver: WebDriver;
+describe('New Board Project Flow', () => {
+    let zet: ZephyrusExtensionTester;
 
     before(() => {
-        // Retrieve a handle for the internal WebDriver instance so 
-        // we can use all its functionality along with the tester API
-        driver = VSBrowser.instance.driver;
+        zet = new ZephyrusExtensionTester();
     });
 
-    // Test the Hello World command does what we expect
-    it('Hello World Command should show a notification with the correct text', async function () {
-        // Execute the Hello World command from the command palette
-        await new Workbench().executeCommand('hello world');
+    it('Triggering a new board project flow should notify with an error if the Zephyr base path could not be deduced', async function() {
+        await zet.issueCommand(ZephyrusExtensionTester.NEW_BOARD_PROJECT_COMMAND);
 
-        // Wait for a notification to appear with a timeout of 2 seconds
-        // The result is cast to Notification because our wait condition may return undefined
-        const notification = await driver.wait(() => { return notificationExists('Hello'); }, 2000) as Notification;
+        const notification = await zet.lookUpNotification("Neither the 'ZEPHYR_BASE' environmental");
 
-        // Assert the notification indeed says Hello World!
-        expect(await notification.getMessage()).equals('Hello World!');
-        expect(await notification.getType()).equals(NotificationType.Info);
+        expect(await notification.getType()).equals(NotificationType.Error);
+    });
+
+    it('Triggering a new board project should not notify with an error if ZEPHYR_BASE is set', async function() {
+        process.env["ZEPHYR_BASE"] = "/some/path";
+        await zet.issueCommand(ZephyrusExtensionTester.NEW_BOARD_PROJECT_COMMAND);
+
+        const notification = await zet.lookUpNotification("Neither the 'ZEPHYR_BASE' environmental");
+
+        assert.isUndefined(notification, 'No notification should be displayed');
     });
 });
-
-/**
- * Example wait condition for WebDriver. Wait for a notification with given text to appear.
- * Wait conditions resolve when the first truthy value is returned.
- * In this case we choose to return the first matching notification object we find,
- * or undefined if no such notification is found.
- */
-async function notificationExists(text: string): Promise<Notification | undefined> {
-    const notifications = await new Workbench().getNotifications();
-    for (const notification of notifications) {
-        const message = await notification.getMessage();
-        if (message.indexOf(text) >= 0) {
-            return notification;
-        }
-    }
-	return undefined;
-}
