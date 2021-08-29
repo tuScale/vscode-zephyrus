@@ -41,8 +41,7 @@ export default class ZepyhrusConfig {
 
     get zephyrBase(): String {
         const configuredPath = this._getConfig(ZepyhrusConfig.BASE_PATH_KEY);
-        const envPath = process.env["ZEPHYR_BASE"];
-        const zephyrBasePath = configuredPath ? configuredPath : envPath;
+        const zephyrBasePath = configuredPath ?? process.env.ZEPHYR_BASE;
 
         if (!zephyrBasePath) {
             throw new ZephyrusConfigException(ZepyhrusConfig.ZEPHYR_BASE_MISSING_MESSAGE);

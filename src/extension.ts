@@ -11,6 +11,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	await zExt.onActivation();
 
 	console.log('Zephyrus is now active');
+	return zExt;
 }
 
 export async function deactivate() {

@@ -14,11 +14,12 @@ import Widget from './widgets/Widget';
 import ZephyrBuildRuntime from './ZephyrBuildRuntime';
 import ZepyhrusConfig from './ZephyrusConfig';
 
-export type FlowType = Symbol;
+export type FlowType = Symbol & { meta: "Zephyrus Flow Type" };
 
 export default class ZephyrusExtension {
-    public static readonly CHANGE_PROJECT_BOARD_FLOW = Symbol.for("ChangeProjectBoardThroughStatusBarFlow");
-    public static readonly NEW_PROJECT_FLOW = Symbol.for("NewProjectFlow");
+    public static readonly CHANGE_PROJECT_BOARD_FLOW = Symbol.for("ChangeProjectBoardThroughStatusBarFlow") as FlowType;
+    public static readonly CONFIG_SECTION_NAME = 'zephyrus';
+    public static readonly NEW_PROJECT_FLOW = Symbol.for("NewProjectFlow") as FlowType;
 
     readonly boardSelector: BoardSelector;
     private buildRuntime: ZephyrBuildRuntime | null = null;
@@ -28,7 +29,7 @@ export default class ZephyrusExtension {
     
     public constructor(private readonly vsCodeContext: vscode.ExtensionContext) {
         this.boardSelector = new BoardSelector(this);
-        this.config = new ZepyhrusConfig('zephyrus');
+        this.config = new ZepyhrusConfig(ZephyrusExtension.CONFIG_SECTION_NAME);
         this.westTaskProvider = vscode.tasks.registerTaskProvider('west', new WestTaskProvider(this));
     }
 
@@ -44,6 +45,7 @@ export default class ZephyrusExtension {
     }
 
     async onDeactivation() {
+        this.buildRuntime = null;
         this.westTaskProvider.dispose();
     }
 
