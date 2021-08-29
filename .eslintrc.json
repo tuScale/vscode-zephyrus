@@ -14,6 +14,7 @@
             "warn",
             { "selector": ["typeLike", "enumMember"], "format": ["PascalCase"] },
             { "selector": "classProperty", "modifiers": ["public", "static", "readonly"], "format": ["UPPER_CASE"] },
+            { "selector": "classProperty", "modifiers": ["private", "static", "readonly"], "format": ["UPPER_CASE"] },
             { "selector": "variable", "modifiers": ["const", "global"], "format": ["UPPER_CASE"] },
             { "selector": "default", "format": ["camelCase"] },
             { "selector": "method", "modifiers": ["private"], "format": ["camelCase"], "leadingUnderscore": "require" },
