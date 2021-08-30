@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import ZephyrusConfigException from './exceptions/ZephyrusConfigException';
 import Board from "./models/Board";
 
 type PotentialStringToAnyMapper = (val: string | undefined) => any;
@@ -22,10 +23,6 @@ class ZephyrConfigKey {
         readonly key: string,
         readonly valIfMissing: string | undefined,
         public mapValueToInstance: (val: string | undefined) => any) {}
-}
-
-export class ZephyrusConfigException {
-    constructor(readonly reason: string) {}
 }
 
 export default class ZepyhrusConfig {

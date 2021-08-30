@@ -2,6 +2,7 @@ import { spawn }  from 'child_process';
 import { EventEmitter, Stream } from 'stream';
 
 import * as vscode from 'vscode';
+import BadZephyrPathException from './exceptions/BadZephyrPathException';
 
 import CommandNotFoundException from './exceptions/CommandNotFoundException';
 import { MessageType } from './models/MessageType';
@@ -126,6 +127,7 @@ export default class WestExecutor {
 
         return new Promise((accept, reject) => {
             let stdoutData: Buffer | null = null;
+            let stderrData: Buffer | null = null;
 
             west.stdout.on('data', data => {
                 if (!stdoutData) {
@@ -135,7 +137,11 @@ export default class WestExecutor {
                 }
             });
             west.stderr.on('data', data => {
-                // TODO: ?
+                if (!stderrData) {
+                    stderrData = data;
+                } else {
+                    stderrData = Buffer.concat([ stderrData, data ]);
+                }
                 console.error(`WestExecutor stderr: ${data}`);
             });
             
@@ -149,6 +155,11 @@ export default class WestExecutor {
                     /* TODO: now what? Eg of such an error exit code state:
                        [stderr] west: error: argument <command>: invalid choice: 'boards' (choose ...
                     */
+                   const stdErrString = stderrData?.toString() ?? "";
+
+                   if (stdErrString.includes("west: error: argument <command>: invalid choice:")) {
+                       reject(new BadZephyrPathException("While present, it looks like the provided Zephyr base path is not valid. Please make sure that it's correct and try again."));
+                   }
                 } else {
                     console.error(`West exited with an abnormal code ${code}.`);
                     reject();

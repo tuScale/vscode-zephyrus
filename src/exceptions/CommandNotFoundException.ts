@@ -1,7 +1,16 @@
-export default class CommandNotFoundException {
-    public constructor(readonly command: string) {}
+import { MessageType } from "../models/MessageType";
+import MessagebleException from "./MessagebleException";
+
+function commandToReason(command: string) {
+    return `${command} command line not found`;
+}
+
+export default class CommandNotFoundException extends MessagebleException {
+    public constructor(readonly command: string) {
+        super(MessageType.Error, commandToReason(command));
+    }
 
     get reason() {
-        return `${this.command} command line not found`;
+        return commandToReason(this.command);
     }
 }

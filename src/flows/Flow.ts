@@ -1,11 +1,11 @@
 import events = require("events");
 
 import CommandNotFoundException from "../exceptions/CommandNotFoundException";
+import MessagebleException from "../exceptions/MessagebleException";
 import UserCancelledFlowException from "../exceptions/UserCancelledFlowException";
 import { MessageType } from "../models/MessageType";
 import WestExecutor from "../WestExecutor";
 import CallToUriActionMessage from "../widgets/CallToUriActionMessage";
-import { ZephyrusConfigException } from "../ZephyrusConfig";
 
 export enum FlowExecutionResult {
     Completed,
@@ -31,8 +31,9 @@ export default abstract class Flow extends events.EventEmitter {
                         "Cancel"
                     );
                 }
-            } else if (e instanceof ZephyrusConfigException) {
-                CallToUriActionMessage.show(MessageType.Error, e.reason);
+            } else if (e instanceof MessagebleException) {
+                // Catch-all messageble exception notifier
+                CallToUriActionMessage.showException(e);
             }
         }
         return FlowExecutionResult.Errored;

@@ -1,9 +1,9 @@
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
+
 import ZephyrusConfig from '../../ZephyrusConfig';
 import ZephyrusExtension from '../../ZephyrusExtension';
 
-type ZephyrusExtensionCommand = string & { meta: 'Zephyrus Command' };
 type ZephyrConfigInspect<T> = {
     defaultValue?: T;
     globalValue?: T;
@@ -17,6 +17,13 @@ type ZephyrConfigInspect<T> = {
 
     languageIds?: string[];
 } | undefined;
+type ZephyrusExtensionCommand = string & { meta: 'Zephyrus Command' };
+type ZephyrusTesterNotificationStubs = {
+    error: sinon.SinonStub;
+};
+type ZephyrusTesterStubs = {
+    messages: ZephyrusTesterNotificationStubs;
+};
 
 export interface ZephyrusExtensionEnvironmentOptions {
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -37,12 +44,10 @@ export interface ZephyrusExtensionTesterOptions {
 export default class ZephyrusExtensionTester {
     public static readonly NEW_BOARD_PROJECT_COMMAND = 'zephyrus.newBoardProject' as ZephyrusExtensionCommand;
 
-    private static readonly SPIED_SHOW_ERROR_MESSAGE = sinon.spy(vscode.window, "showErrorMessage");
-
-    public static async newFor(opts: ZephyrusExtensionTesterOptions) {
+    public static async getFor(opts: ZephyrusExtensionTesterOptions) {
         let ze: ZephyrusExtension;
         const zExtension = vscode.extensions.getExtension('tuScale.zephyrus');
-        
+
         // Prep up environment and wire-up sinon
         process.env = { ...process.env, ...opts.env };
         sinon.stub(vscode.workspace, "getConfiguration")
@@ -56,7 +61,7 @@ export default class ZephyrusExtensionTester {
         
         if (zExtension?.isActive) {
             ze = zExtension.exports;
-            if (opts.shouldDeactivateFirst) {
+            if (opts.shouldDeactivateFirst === undefined || opts.shouldDeactivateFirst) {
                 await ze.onDeactivation();
             }
         } else {
@@ -74,11 +79,15 @@ export default class ZephyrusExtensionTester {
         // No-op
     }
 
-    public get spies() {
-        return {
+    public async test(whatToTest: (stubs: ZephyrusTesterStubs) => void) {
+        const zeStubs = {
             messages: {
-                error: ZephyrusExtensionTester.SPIED_SHOW_ERROR_MESSAGE
+                error: sinon.stub(vscode.window, "showErrorMessage")
             }
         };
+
+        await whatToTest(zeStubs);
+
+        zeStubs.messages.error.resetHistory();
     }
 }

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import MessagebleException from '../exceptions/MessagebleException';
 
 import { MessageType } from "../models/MessageType";
 
@@ -36,5 +37,9 @@ export default class CallToUriActionMessage {
             }
         }
         return answer;
+    }
+
+    public static showException(e: MessagebleException) {
+        return CallToUriActionMessage.show(e.type, e.text, ...e.actions);
     }
 }
