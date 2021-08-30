@@ -79,7 +79,7 @@
 		"test-watch": "tsc -watch -p ./",
 		"test-pre": "npm run lint && npm run test-compile && npm run compile",
 		"test:ui": "extest setup-and-run out/test/ui/**.test.js",
-		"test:vscode": "node ./out/test/vscode/runTest.js"
+		"test:vscode": "node ./out/test/vscode/runTests.js"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.21",
