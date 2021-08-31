@@ -1,17 +1,11 @@
 import * as path from 'path';
 import * as Mocha from 'mocha';
 import * as glob from 'glob';
-import * as sinon from 'sinon';
 
 export function run(): Promise<void> {
 	const mocha = new Mocha({
 		ui: 'tdd',
-        color: true,
-		rootHooks: {
-			afterEach: function() {
-				sinon.restore();
-			}
-		}
+        color: true
 	});
 	const testsRoot = path.resolve(__dirname, '..');
 

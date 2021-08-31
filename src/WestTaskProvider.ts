@@ -1,5 +1,5 @@
 import { access } from "fs/promises";
-import path = require("path");
+import { join as joinPath } from "path";
 import * as fs from 'fs';
 
 import * as vscode from "vscode";
@@ -67,7 +67,7 @@ export default class WestTaskProvider implements vscode.TaskProvider {
                 let flashShellCmdArgs = [];
 
                 try {
-                    await access(path.join(workspaceFolderPath, relativeBuildDir), fs.constants.F_OK);   
+                    await access(joinPath(workspaceFolderPath, relativeBuildDir), fs.constants.F_OK);   
                     flashShellCmdArgs.push('-d', relativeBuildDir);
                 } catch(e) {
                     // No-op
