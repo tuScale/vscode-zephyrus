@@ -10,7 +10,7 @@ suite('New Board Project Flow', function () {
 
 		return zet.test(async (opts, zeStubs) => {
 			delete process.env.ZEPHYR_BASE;
-			opts.settings.basePath?.reset();
+			opts.settings.basePath.reset();
 
 			await zet.ze.startFlow(ZephyrusExtension.NEW_PROJECT_FLOW);
 
@@ -24,7 +24,7 @@ suite('New Board Project Flow', function () {
 
 		return zet.test(async (opts, zeStubs) => {
 			process.env.ZEPHYR_BASE = '/some/non-existing/path';
-			opts.settings.basePath?.reset();
+			opts.settings.basePath.reset();
 
 			await zet.ze.startFlow(ZephyrusExtension.NEW_PROJECT_FLOW);
 

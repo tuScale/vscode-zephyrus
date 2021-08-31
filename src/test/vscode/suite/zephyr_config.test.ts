@@ -8,10 +8,9 @@ suite('Zephyr Config', function () {
 
 		return zet.test(async (opts, _zeStubs) => {
 			process.env.ZEPHYR_BASE = '/env/zephyr/base';
-			opts.settings.basePath!.workspaceValue = '/sett/zephyr/base';
+			opts.settings.basePath.workspaceValue = '/sett/zephyr/base';
 
-            assert.equal(zet.ze.config.zephyrBase, opts.settings.basePath?.workspaceValue);
+            assert.equal(zet.ze.config.zephyrBase, opts.settings.basePath.workspaceValue);
 		});
-
     });
 });

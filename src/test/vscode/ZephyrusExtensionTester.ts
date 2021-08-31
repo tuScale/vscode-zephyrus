@@ -4,6 +4,14 @@ import * as vscode from 'vscode';
 import ZephyrusConfig from '../../ZephyrusConfig';
 import ZephyrusExtension from '../../ZephyrusExtension';
 
+type ZephyrusExtensionCommand = string & { meta: 'Zephyrus Command' };
+type ZephyrusTesterNotificationStubs = {
+    error: sinon.SinonStub;
+};
+type ZephyrusTesterStubs = {
+    messages: ZephyrusTesterNotificationStubs;
+};
+
 class ZephyrConfigInspect<T> {
     defaultValue?: T;
     globalValue?: T;
@@ -24,21 +32,23 @@ class ZephyrConfigInspect<T> {
         this.workspaceFolderLanguageValue = undefined;
     }
 };
-type ZephyrusExtensionCommand = string & { meta: 'Zephyrus Command' };
-type ZephyrusTesterNotificationStubs = {
-    error: sinon.SinonStub;
-};
-type ZephyrusTesterStubs = {
-    messages: ZephyrusTesterNotificationStubs;
-};
 
-export interface ZephyrusSettings {
-    basePath?: ZephyrConfigInspect<string>;
-    zephyrBoard?: ZephyrConfigInspect<string>;
+export class ZephyrusSettings {
+    readonly basePath = new ZephyrConfigInspect<string>();
+    readonly zephyrBoard = new ZephyrConfigInspect<string>();
+
+    public reset() {
+        this.basePath.reset();
+        this.zephyrBoard.reset();
+    }
 }
 
-export interface ZephyrusExtensionTesterOptions {
-    settings: ZephyrusSettings
+export class ZephyrusExtensionTesterOptions {
+    readonly settings = new ZephyrusSettings();
+
+    public reset() {
+        this.settings.reset();
+    }
 }
 
 export default class ZephyrusExtensionTester {
@@ -51,15 +61,9 @@ export default class ZephyrusExtensionTester {
 
         if (!ZephyrusExtensionTester.ZET) {
             let ze: ZephyrusExtension;
-            let opts: ZephyrusExtensionTesterOptions = {
-                settings: {
-                    basePath: new ZephyrConfigInspect<string>(),
-                    zephyrBoard: new ZephyrConfigInspect<string>()
-                }
-            };
+            let opts = new ZephyrusExtensionTesterOptions();
 
-            // Prep up environment and wire-up sinon
-            // sinon.stub(process, 'env').returns({ ...process.env, 'ZEPHYR_BASE': opts.env.ZEPHYR_BASE });
+            // Wire-up sinon
             sinon.stub(vscode.workspace, "getConfiguration")
                 .withArgs(ZephyrusExtension.CONFIG_SECTION_NAME)
                 .returns({ 
@@ -97,7 +101,9 @@ export default class ZephyrusExtensionTester {
 
         await whatToTest(this.opts, zeStubs);
 
+        // Cleanup
         zeStubs.messages.error.restore();
+        this.opts.reset();
         await this.ze.onDeactivation();
     }
 }
