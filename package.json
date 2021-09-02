@@ -73,7 +73,6 @@
 		"package": "webpack --mode production --devtool hidden-source-map",
 		"lint": "eslint src --ext ts",
 		"vscode:prepublish": "npm run package",
-		
 		"test": "npm run test-pre && npm run test:vscode && npm run test:ui",
 		"test-compile": "tsc -p ./",
 		"test-watch": "tsc -watch -p ./",
@@ -88,6 +87,7 @@
 		"@types/node": "14.x",
 		"@types/sinon": "^10.0.2",
 		"@types/vscode": "^1.59.0",
+		"@types/yauzl": "^2.9.2",
 		"@typescript-eslint/eslint-plugin": "^4.26.0",
 		"@typescript-eslint/parser": "^4.26.0",
 		"@vscode/test-electron": "^1.6.2",
@@ -103,9 +103,11 @@
 		"vscode-extension-tester-native": "^3.0.2",
 		"vscode-test": "^1.5.2",
 		"webpack": "^5.38.1",
-		"webpack-cli": "^4.7.0"
+		"webpack-cli": "^4.8.0",
+		"yauzl": "^2.10.0"
 	},
 	"dependencies": {
+		"@octokit/request": "^5.6.1",
 		"peg-cmake": "0.0.8"
 	}
 }

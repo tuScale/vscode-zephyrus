@@ -2,10 +2,11 @@ import {
     VSBrowser, Workbench, WebDriver, 
     Notification
 } from 'vscode-extension-tester';
+import ZephyrusExtensionTester from '../ZephyrusExtensionTester';
 
 type ZephyrusExtensionCommand = string & { meta: 'Zephyrus Command' };
 
-export default class ZephyrusExtensionTester {
+export default class UIExtensionTester implements ZephyrusExtensionTester {
     public static readonly NEW_BOARD_PROJECT_COMMAND = 'Zephyr: New board project' as ZephyrusExtensionCommand;
 
     private driver: WebDriver;
